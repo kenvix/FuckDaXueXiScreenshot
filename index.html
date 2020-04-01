@@ -10,9 +10,67 @@
     <style>
     
     </style>
-    <img style="position:absolute;left:0px;top:0px;width:100%;height:100%" src="img/[season]/[term]-[type].jpg" referrerpolicy="no-referrer" />
+    <img style="position:absolute;left:0px;top:0px;width:100%;height:100%" id="main-img" onerror="onImageLoadError();" src="img/[season]/[term]-[type].jpg" referrerpolicy="no-referrer" />
 
     <script>
-    
+        function getQuery() {
+            const url = decodeURI(location.search); // 获取url中"?"符后的字串(包括问号)
+            let query = {};
+            if (url.indexOf("?") != -1) {
+                const str = url.substr(1);
+                const pairs = str.split("&");
+                for(let i = 0; i < pairs.length; i ++) {
+                    const pair = pairs[i].split("=");
+                    query[pair[0]] = pair[1];
+                }
+            }
+            return query ;  // 返回对象
+        }
+
+        function sectionToChinese(section){
+            var chnNumChar = ["零","一","二","三","四","五","六","七","八","九"];
+            var chnUnitChar = ["","十","百","千","万","亿","万亿","亿亿"];
+            var strIns = '', chnStr = '';
+            var unitPos = 0;
+            var zero = true;
+            while(section > 0){
+                var v = section % 10;
+                if(v === 0){
+                    if(!zero){
+                        zero = true;
+                        chnStr = chnNumChar[v] + chnStr;
+                    }
+                }else{
+                    zero = false;
+                    strIns = chnNumChar[v];
+                    strIns += chnUnitChar[unitPos];
+                    chnStr = strIns + chnStr;
+                }
+                unitPos++;
+                section = Math.floor(section / 10);
+            }
+            return chnStr;
+        }
+
+        queryArguments = getQuery();
+        
+        function onImageLoadError() {
+            if (!queryArguments.hasOwnProperty('term') || !queryArguments.hasOwnProperty('season'))
+                alert('使用方法不正确，请指定 term 和 season 参数。参见 https://github.com/kenvix/FuckDaXueXiScreenshot');
+            else
+                alert('找不到指定大学习期数，请检查使用方法是否正确。参见 https://github.com/kenvix/FuckDaXueXiScreenshot');
+        }
+
+        function replacePlaceholders(text) {
+            return text
+                .replace("[season]", queryArguments['season'])
+                .replace("[seasonChinese]", sectionToChinese(queryArguments['season']))
+                .replace("[term]", queryArguments['term'])
+                .replace("[termChinese]", sectionToChinese(queryArguments['term']))
+                .replace("[type]", queryArguments.hasOwnProperty('type') ? queryArguments['type'] : '0');
+        }
+
+        document.getElementsByTagName("title")[0].text = replacePlaceholders(document.getElementsByTagName("title")[0].text);
+        document.getElementById("main-img").src = replacePlaceholders(document.getElementById("main-img").src);
     </script>
 </html>
