@@ -14,6 +14,8 @@
 
 `https://kenvix.github.io/FuckDaXueXiScreenshot/index.html?term=7&season=8&type=1`
 
+不指定参数是打不开的
+
 ## 如何贡献本项目
 
 大学习截图是需要人力添加的。
